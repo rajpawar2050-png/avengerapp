@@ -1,1 +1,30 @@
 hiii love you aws server client  love you server
+import boto3
+
+ec2 = boto3.client('ec2')
+
+def lambda_handler(event, context):
+    response = ec2.run_instances(
+        ImageId='ami-0abcdef1234567890',  # Replace with valid AMI
+        InstanceType='t2.micro',
+        MinCount=1,
+        MaxCount=1,
+        KeyName='my-keypair',
+        SecurityGroupIds=['sg-0123456789abcdef0'],
+        SubnetId='subnet-0123456789abcdef0',
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {'Key': 'Name', 'Value': 'Lambda-EC2-Instance'}
+                ]
+            }
+        ]
+    )
+
+    instance_id = response['Instances'][0]['InstanceId']
+
+    return {
+        'statusCode': 200,
+        'body': f'EC2 Instance created: {instance_id}'
+    }
